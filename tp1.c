@@ -28,11 +28,41 @@ int main ()
     }
 
     for(int i=0; i<n; i++){
+    
+        // sorteia racionais com numerador e denominador entre -max e max 
+        struct racional r1 = sorteia_r(-max, max);
+        struct racional r2 = sorteia_r(-max, max);
 
-        sorteia_r(n, max);
+        printf("%d: ", i);
 
-        printf("%d :", i);
+        imprime_r(r1);
+        printf(" ");
+        imprime_r(r2);
+        
+        if(!valido_r(r1) || !valido_r(r2)){
+            printf("NUMERO INVALIDO");
+            return 1;
+        }
 
+        //calcula
+        soma_r(r1, r2);
+        subtrai_r(r1, r2);
+        multiplica_r(r1, r2);
+        divide_r(r1, r2);
+
+       /* if(valido_r(divisao)){
+            printf("DIVISAO INVALIDA");
+            return 1;
+        }*/
+
+        //imprime
+        soma_r(r1, r2);
+        subtrai_r(r1, r2);
+        multiplica_r(r1, r2);
+        divide_r(r1, r2);
+
+        //muda linha
+        printf("\n");
 
     }
 
