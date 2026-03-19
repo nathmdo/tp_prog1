@@ -23,7 +23,7 @@
 long aleat (long min, long max)
 {
   //long num = rand() % 31; //sorteia um numero de 1 a 30
-  //long num = min + rand() % (max - min + 1);//fórmula generalizada acho que está mais certa hihi
+  //long num = min + rand() % (max - min + 1);//fórmula generalizada acho que está mais certa
   //de min até max   de -max até max
 
   //Garante que min <= max
@@ -207,7 +207,20 @@ void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
 /* Retorna a soma dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
 struct racional soma_r (struct racional r1, struct racional r2){
-  /* implemente aqui */
+
+  struct racional resultado;  
+  
+  if(valido_r(r1) && valido_r(r2)){
+    resultado.num = ((r1.num * r2.den) + (r2.num * r1.den));
+    resultado.den = r1.den * r2.den;
+    resultado = simplifica_r(resultado);
+
+  } else {
+    resultado.num = 0;
+    resultado.den = 0;
+  }
+
+  return resultado;
 }
 
 
@@ -215,7 +228,20 @@ struct racional soma_r (struct racional r1, struct racional r2){
 /* Retorna a subtração dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
 struct racional subtrai_r (struct racional r1, struct racional r2){
-  /* implemente aqui */
+  
+  struct racional resultado;
+  
+  if(valido_r(r1) && valido_r(r2)){
+    resultado.num = ((r1.num * r2.den) - (r2.num * r1.den));
+    resultado.den = r1.den * r2.den;
+    resultado = simplifica_r(resultado);
+
+  } else {
+    resultado.num = 0;
+    resultado.den = 0;
+  }
+
+  return resultado;
 }
 
 
@@ -223,7 +249,21 @@ struct racional subtrai_r (struct racional r1, struct racional r2){
 /* Retorna a multiplicação dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
 struct racional multiplica_r (struct racional r1, struct racional r2){
-  /* implemente aqui */
+
+  struct racional resultado;
+  
+  if(valido_r(r1) && valido_r(r2)){
+    resultado.num = r1.num * r2.num;
+    resultado.den = r1.den * r2.den;
+    resultado = simplifica_r(resultado);
+
+  } else {
+    resultado.num = 0;
+    resultado.den = 0;
+  }
+
+  return resultado;
+  
 }
 
 
@@ -232,5 +272,19 @@ struct racional multiplica_r (struct racional r1, struct racional r2){
  * se r1 ou r2 for inválido, o resultado deve ser inválido.
  * observe que a divisão com r1 e r2 válidos pode gerar um racional inválido */
 struct racional divide_r (struct racional r1, struct racional r2){
-  /* implemente aqui */
+  
+   struct racional resultado;
+  
+  if(valido_r(r1) && valido_r(r2) && (r2.den !=0)){
+    resultado.num = r1.num * r2.den;
+    resultado.den = r1.den * r2.num;
+    resultado = simplifica_r(resultado);
+
+  } else {
+    resultado.num = 0;
+    resultado.den = 0;
+  }
+
+  return resultado;
+  
 }
