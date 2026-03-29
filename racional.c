@@ -10,22 +10,15 @@
 
 /* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
-#include <stdlib.h> //acho que vai precisar pro labs (abs do tipo long)
+#include <stdlib.h>
 #include "racional.h"
-
-
-/*
- * Implemente aqui as funcoes definidas no racionais.h; caso precise,
- * pode definir aqui funcoes auxiliares adicionais, que devem ser usadas
- * somente neste arquivo.
-*/
 
 
 /* retorna um número aleatório entre min e max, inclusive. */
 long aleat (long min, long max)
 {
-  //Garante que min <= max
-  if(min > max){
+  
+  if(min > max){  //Garante que min <= max
     long temp = min;
     min = max;
     max = temp;
@@ -36,7 +29,6 @@ long aleat (long min, long max)
 
 
 /* Máximo Divisor Comum entre a e b      */
-/* calcula o MDC pelo método de Euclides */
 long mdc (long a, long b)
 {
   long resto;
@@ -49,17 +41,9 @@ long mdc (long a, long b)
 
   return a;
 }
-//usa scanf("%ld", &y)
-/*  printf("Número 1: ");
-    scanf("%ld", &x);
-
-    printf("Número 2: ");
-    scanf("%ld", &y);*/
-
 
 
 /* Mínimo Múltiplo Comum entre a e b */
-/* mmc = (a * b) / mdc (a, b)        */
 long mmc (long a, long b)
 {
   return (a*b) / mdc(a,b);
@@ -94,9 +78,6 @@ struct racional simplifica_r(struct racional r)
 }
 
 
-/* implemente as demais funções aqui */
-
-
 /* Cria um número racional com o numerador e denominador indicados. */
 struct racional cria_r (long numerador, long denominador){
 
@@ -115,15 +96,9 @@ int valido_r (struct racional r){
   if(r.den == 0){
         return 0;//inválido
   }
-
  return 1;//válido
 
 }
-/*ou:
-// Verifica se o racional é válido (den ≠ 0).
-int valido_r(struct racional r) {
-    return r.den != 0;
-}*/
 
 
 /* Retorna um número racional aleatório na forma simplificada.
@@ -156,13 +131,24 @@ struct racional sorteia_r (long min, long max){
      - se numerador e denominador forem negativos, o racional é positivo. */
 void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
 
+  if (r.den == 0 && r.num != 0) {
+        printf("DIVISAO INVALIDA");
+        return;
+    }
+
+  // caso inválido por operação (denominador zero e numerador == 0)
+  if (r.den == 0 && r.num == 0) {
+        printf("NUMERO INVALIDO");
+        return;
+  }
+
   //Racional invalido
   if(!valido_r(r)){
     printf("INVALIDO");
     return;
   }
 
-    r = simplifica_r(r);
+  r = simplifica_r(r);
 
   //Se numerador = 0
   if(r.num == 0){
@@ -181,8 +167,7 @@ void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
     return;
   }
 
-  printf("%ld/%ld ", r.num, r.den);
-
+  printf("%ld/%ld", r.num, r.den);
 }
 
 
@@ -259,9 +244,24 @@ struct racional divide_r (struct racional r1, struct racional r2){
    struct racional resultado;
   
   if(valido_r(r1) && valido_r(r2)){
+
+    // se o numerador do divisor é 0 → divisão inválida
+        if (r2.num == 0) {
+            resultado.num = 1;  // marcador especial
+            resultado.den = 0;  // den=0 mas num≠0 → imprime "DIVISAO INVALIDA"
+            return resultado;
+        }
+
     resultado.num = r1.num * r2.den;
     resultado.den = r1.den * r2.num;
-    resultado = simplifica_r(resultado);
+
+    // se o denominador virou zero, marca como inválido
+    if (resultado.den == 0) {
+          resultado.num = 0;
+          resultado.den = 0; // den=0 e num=0 → imprime "NUMERO INVALIDO"
+    } else {
+          resultado = simplifica_r(resultado);
+    }
 
   } else {
     resultado.num = 0; //cria_r(0,0); // inválido
