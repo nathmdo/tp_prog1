@@ -10,6 +10,7 @@
 
 /* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
+#include <stdlib.h> //acho que vai precisar pro labs (abs do tipo long)
 #include "racional.h"
 
 
@@ -19,26 +20,21 @@
  * somente neste arquivo.
 */
 
+
 /* retorna um número aleatório entre min e max, inclusive. */
 long aleat (long min, long max)
 {
-  //long num = rand() % 31; //sorteia um numero de 1 a 30
-  //long num = min + rand() % (max - min + 1);//fórmula generalizada acho que está mais certa
-  //de min até max   de -max até max
-
   //Garante que min <= max
   if(min > max){
     long temp = min;
     min = max;
     max = temp;
   }
-
-  //Fórmula
+  //Fórmula: desloca para começar em 'min' e garante intervalo até 'max'
   return min + rand() % (max - min + 1);
 }
 
 
-/************testar********** z*/
 /* Máximo Divisor Comum entre a e b      */
 /* calcula o MDC pelo método de Euclides */
 long mdc (long a, long b)
@@ -54,6 +50,11 @@ long mdc (long a, long b)
   return a;
 }
 //usa scanf("%ld", &y)
+/*  printf("Número 1: ");
+    scanf("%ld", &x);
+
+    printf("Número 2: ");
+    scanf("%ld", &y);*/
 
 
 
@@ -74,33 +75,23 @@ long mmc (long a, long b)
  * Se r for inválido, devolve-o sem simplificar. */
 struct racional simplifica_r(struct racional r)
 {
-  if( r.den == 0 ){
-    return r;
+  if( r.den == 0 ){ 
+    return r; //acho q dá pra chamar a função valido_r()
   }
 
   // Calcula o MDC do numerador e denominador
-    long divisor = mdc(r.num, r.den);
+    long divisor = mdc(labs(r.num), labs(r.den));
 
     r.num = r.num/divisor;
     r.den = r.den/divisor;
 
-    /*****************melhorar*************** */
     //jogo de sinais
-    if( r.num < 0 && r.den < 0){
+    if( r.den < 0){
       r.num = -r.num;
       r.den = -r.den;
     }
-
-    if( r.num > 0 && r.den < 0){
-      r.num = -r.num;
-      r.den = -r.den;
-    }
-
     return r;
 }
-/***********revisar*********** */
-
-
 
 
 /* implemente as demais funções aqui */
@@ -109,10 +100,10 @@ struct racional simplifica_r(struct racional r)
 /* Cria um número racional com o numerador e denominador indicados. */
 struct racional cria_r (long numerador, long denominador){
 
-  struct racional r;
-  r.num = numerador;
-  r.den = denominador;
-  return r;
+  struct racional r; // declara uma variável local do tipo 'struct racional'
+  r.num = numerador; // atribui o valor recebido ao campo 'num' (numerador)
+  r.den = denominador; // atribui o valor recebido ao campo 'den' (denominador)
+  return r;  // retorna a struct preenchida
   
 }
 
@@ -121,13 +112,18 @@ struct racional cria_r (long numerador, long denominador){
  * Um racional é inválido se seu denominador for zero */
 int valido_r (struct racional r){
 
-  if(r.den = 0){
+  if(r.den == 0){
         return 0;//inválido
   }
 
  return 1;//válido
 
 }
+/*ou:
+// Verifica se o racional é válido (den ≠ 0).
+int valido_r(struct racional r) {
+    return r.den != 0;
+}*/
 
 
 /* Retorna um número racional aleatório na forma simplificada.
@@ -136,17 +132,17 @@ int valido_r (struct racional r){
  * O numerador e o denominador devem ser inteiros entre min e max. */
 struct racional sorteia_r (long min, long max){
   
-  long num = aleat(min,max);
-  long den = aleat(min,max);
+  long num = aleat(min,max); //sorteia numerador
+  long den = aleat(min,max); //sorteia denominador
 
   // cria racional com os valores sorteados
   struct racional r = cria_r(num, den);
   
-  // simplifica antes de retornar
-    r = simplifica_r(r); 
-    return r;
-
+  // simplifica e retorna 
+    return simplifica_r(r);
 }
+
+
 
 /* Imprime um racional r, respeitando estas regras:
    - o racional deve ser impresso na forma simplificada;
@@ -160,24 +156,23 @@ struct racional sorteia_r (long min, long max){
      - se numerador e denominador forem negativos, o racional é positivo. */
 void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
 
-  //Simplifica primeiro
-  r = simplifica_r(r);
-
   //Racional invalido
-  if(valido_r(r)){
+  if(!valido_r(r)){
     printf("INVALIDO");
     return;
   }
 
+    r = simplifica_r(r);
+
   //Se numerador = 0
-  if(r.num = 0){
+  if(r.num == 0){
     printf("0");
     return;
   }
   
   //Se denominador = 1
-  if(r.den = 1){
-    printf("num");
+  if(r.den == 1){
+    printf("%ld", r.num);
     return;
   }
 
@@ -186,19 +181,7 @@ void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
     return;
   }
 
-  //Não sei se ajusta o sinal aqui ou em simplifica********
-  /*// Ajusta sinal: se ambos negativos, fica positivo
-    if (r.num < 0 && r.den < 0) {
-        r.num = -r.num;
-        r.den = -r.den;
-    }
-    // Se só um é negativo, imprime com sinal antes do numerador
-    else if (r.den < 0) {
-        r.num = -r.num;
-        r.den = -r.den;
-    }*/
-
-  printf("%ld/%ld ", r.num, r.den);//ld pq usa long int
+  printf("%ld/%ld ", r.num, r.den);
 
 }
 
@@ -275,13 +258,13 @@ struct racional divide_r (struct racional r1, struct racional r2){
   
    struct racional resultado;
   
-  if(valido_r(r1) && valido_r(r2) && (r2.den !=0)){
+  if(valido_r(r1) && valido_r(r2)){
     resultado.num = r1.num * r2.den;
     resultado.den = r1.den * r2.num;
     resultado = simplifica_r(resultado);
 
   } else {
-    resultado.num = 0;
+    resultado.num = 0; //cria_r(0,0); // inválido
     resultado.den = 0;
   }
 

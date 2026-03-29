@@ -21,13 +21,13 @@ int main ()
     scanf ("%d", &max); //leitura de max sendo 0 < max < 30
 
     //verifica e imprime
-    if((n>1 & n<100) && (max>0 & max<30) ){
+    if((n>=1 && n<100) && (max>0 && max<30) ){
         printf("%d %d\n", n, max);
     } else {
         return(0); //saiiii
     }
 
-    for(int i=0; i<n; i++){
+    for(int i=1; i<n; i++){
     
         printf("%d: ", i);
 
@@ -35,15 +35,23 @@ int main ()
         struct racional r1 = sorteia_r(-max, max);
         struct racional r2 = sorteia_r(-max, max);
 
-        imprime_r(r1);
-        printf(" ");
-        imprime_r(r2);
-        
+       /* printf("DEBUG r1.num=%ld r1.den=%ld | r2.num=%ld r2.den=%ld\n", r1.num, r1.den, r2.num, r2.den);
+
+        printf("DEBUG valido_r(r1)=%d valido_r(r2)=%d\n", valido_r(r1), valido_r(r2));
+*/
+
+
         /*Se algum for inválido imprime e retorna 1 */
         if(!valido_r(r1) || !valido_r(r2)){
             printf("NUMERO INVALIDO");
             return 1;
         }
+
+        imprime_r(r1);
+        printf(" ");
+        imprime_r(r2);
+        
+        
 
         //calcula
         struct racional soma = soma_r(r1, r2);
