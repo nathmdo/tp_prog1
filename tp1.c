@@ -18,7 +18,7 @@ int main()
     scanf("%d", &n);   // leitura do valor n sendo  0 < n < 100
     scanf("%d", &max); // leitura de max sendo 0 < max < 30
 
-    // verifica e imprime
+    // verifica e imprime n e max
     if ((n > 0 && n < 100) && (max > 0 && max < 30))
     {
         printf("%d %d\n", n, max);
@@ -28,10 +28,12 @@ int main()
         return (0);
     }
 
+
     for (int i = 1; i <= n; i++)
     {
-
         printf("%d: ", i);
+
+        struct racional soma, sub, multi, divi;
 
         // sorteia racionais com numerador e denominador entre -max e max
         struct racional r1 = sorteia_r(-max, max);
@@ -40,22 +42,29 @@ int main()
         imprime_r(r1);
         printf(" ");
         imprime_r(r2);
+        printf(" ");
 
-        /*Se algum for inválido imprime e retorna 1 */
         if (!valido_r(r1) || !valido_r(r2))
         {
+            printf("NUMERO INVALIDO");
             printf("\n");
             return 1;
         }
 
         // calcula
-        struct racional soma = soma_r(r1, r2);
-        struct racional sub = subtrai_r(r1, r2);
-        struct racional multi = multiplica_r(r1, r2);
-        struct racional divi = divide_r(r1, r2);
+        soma = soma_r(r1, r2);
+        sub = subtrai_r(r1, r2);
+        multi = multiplica_r(r1, r2);
+        divi = divide_r(r1, r2);
+
+        if (!valido_r(divi))
+        {
+            printf("DIVISAO INVALIDA");
+            printf("\n");
+            return 1;
+        }
 
         // imprime
-        printf(" ");
         imprime_r(soma);
         printf(" ");
         imprime_r(sub);
@@ -66,11 +75,6 @@ int main()
 
         printf("\n");
 
-        // fim antecipado se divisão inválida
-        if (divi.den == 0 && divi.num != 0)
-        {
-            return 0;
-        }
     }
 
     return (0);

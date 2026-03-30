@@ -1,4 +1,4 @@
-/* 
+/*
  * Tipos Abstratos de Dados - TADs
  * Arquivo de implementação para TAD racional.
  * Feito em 16/09/2024 para a disciplina CI1001 - Programação 1.
@@ -6,34 +6,33 @@
  * Este arquivo deve conter as implementações das funções cujos protótipos
  * foram definidos em racional.h. Neste arquivo também podem ser definidas
  * funções auxiliares para facilitar a implementação daquelas funções.
-*/
+ */
 
-/* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
 #include <stdlib.h>
 #include "racional.h"
 
-
 /* retorna um número aleatório entre min e max, inclusive. */
-long aleat (long min, long max)
+long aleat(long min, long max)
 {
-  
-  if(min > max){  //Garante que min <= max
+
+  if (min > max)
+  { // Garante que min <= max
     long temp = min;
     min = max;
     max = temp;
   }
-  //Fórmula: desloca para começar em 'min' e garante intervalo até 'max'
+
   return min + rand() % (max - min + 1);
 }
 
-
 /* Máximo Divisor Comum entre a e b      */
-long mdc (long a, long b)
+long mdc(long a, long b)
 {
   long resto;
 
-  while(b!=0){
+  while (b != 0)
+  {
     resto = a % b;
     a = b;
     b = resto;
@@ -42,127 +41,97 @@ long mdc (long a, long b)
   return a;
 }
 
-
 /* Mínimo Múltiplo Comum entre a e b */
-long mmc (long a, long b)
+long mmc(long a, long b)
 {
-  return (a*b) / mdc(a,b);
+  return (a * b) / mdc(a, b);
 }
 
-
-
-
-/* Recebe um número racional e o simplifica.
- * Por exemplo, ao receber 10/8 deve retornar 5/4.
- * Se ambos numerador e denominador forem negativos, deve retornar um positivo.
- * Se o denominador for negativo, o sinal deve migrar para o numerador.
- * Se r for inválido, devolve-o sem simplificar. */
+// Recebe um número racional e o simplifica.
 struct racional simplifica_r(struct racional r)
 {
-  if( r.den == 0 ){ 
-    return r; //acho q dá pra chamar a função valido_r()
+  if (r.den == 0)
+  {
+    return r;
   }
 
   // Calcula o MDC do numerador e denominador
-    long divisor = mdc(labs(r.num), labs(r.den));
+  long divisor = mdc(labs(r.num), labs(r.den));
 
-    r.num = r.num/divisor;
-    r.den = r.den/divisor;
+  r.num = r.num / divisor;
+  r.den = r.den / divisor;
 
-    //jogo de sinais
-    if( r.den < 0){
-      r.num = -r.num;
-      r.den = -r.den;
-    }
-    return r;
+  // jogo de sinais
+  if (r.den < 0)
+  {
+    r.num = -r.num;
+    r.den = -r.den;
+  }
+  return r;
 }
-
 
 /* Cria um número racional com o numerador e denominador indicados. */
-struct racional cria_r (long numerador, long denominador){
-
-  struct racional r; // declara uma variável local do tipo 'struct racional'
-  r.num = numerador; // atribui o valor recebido ao campo 'num' (numerador)
-  r.den = denominador; // atribui o valor recebido ao campo 'den' (denominador)
-  return r;  // retorna a struct preenchida
-  
+struct racional cria_r(long numerador, long denominador)
+{
+  struct racional r;
+  r.num = numerador;
+  r.den = denominador;
+  return r;
 }
 
+// Retorna 1 se o racional r for válido ou 0 se for inválido.
+int valido_r(struct racional r)
+{
 
-/* Retorna 1 se o racional r for válido ou 0 se for inválido.
- * Um racional é inválido se seu denominador for zero */
-int valido_r (struct racional r){
-
-  if(r.den == 0){
-        return 0;//inválido
+  if (r.den == 0)
+  {
+    return 0; // inválido
   }
- return 1;//válido
-
+  return 1; // válido
 }
 
+// Retorna um número racional aleatório na forma simplificada.
+struct racional sorteia_r(long min, long max)
+{
 
-/* Retorna um número racional aleatório na forma simplificada.
- * Deve ser sorteado o numerador e depois o denominador.
- * o racional gerado pode ser válido ou inválido.
- * O numerador e o denominador devem ser inteiros entre min e max. */
-struct racional sorteia_r (long min, long max){
-  
-  long num = aleat(min,max); //sorteia numerador
-  long den = aleat(min,max); //sorteia denominador
+  long num = aleat(min, max); // sorteia numerador
+  long den = aleat(min, max); // sorteia denominador
 
   // cria racional com os valores sorteados
   struct racional r = cria_r(num, den);
-  
-  // simplifica e retorna 
-    return simplifica_r(r);
+
+  // simplifica e retorna
+  return simplifica_r(r);
 }
 
-
-
-/* Imprime um racional r, respeitando estas regras:
-   - o racional deve ser impresso na forma simplificada;
-   - não imprima espaços em branco e não mude de linha;
-   - a saída deve ter o formato "num/den", a menos dos casos abaixo:
-     - se o racional for inválido, deve imprimir a mensagem "INVALIDO";
-     - se o numerador for 0, deve imprimir somente "0";
-     - se o denominador for 1, deve imprimir somente o numerador;
-     - se o numerador e denominador forem iguais, deve imprimir somente "1";
-     - se o racional for negativo, o sinal "-" deve vir antes do numerador;
-     - se numerador e denominador forem negativos, o racional é positivo. */
-void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
-
-  if (r.den == 0 && r.num != 0) {
-        printf("DIVISAO INVALIDA");
-        return;
-    }
-
-  // caso inválido por operação (denominador zero e numerador == 0)
-  if (r.den == 0 && r.num == 0) {
-        printf("NUMERO INVALIDO");
-        return;
-  }
-
-  //Racional invalido
-  if(!valido_r(r)){
+// Imprime um racional r
+void imprime_r(struct racional r)
+{
+  // Racional invalido
+  if (!valido_r(r))
+  {
     printf("INVALIDO");
     return;
   }
 
   r = simplifica_r(r);
 
-  //Se numerador = 0
-  if(r.num == 0){
+  // Se numerador = 0
+  if (r.num == 0)
+  {
     printf("0");
     return;
   }
-  
-  //Se denominador = 1
-  if(r.den == 1){
+
+  // Se denominador = 1
+  if (r.den == 1)
+  {
     printf("%ld", r.num);
     return;
   }
 
-  if(r.num == r.den){
+  if (r.num == r.den)
+  {
     printf("1");
     return;
   }
@@ -170,104 +139,102 @@ void imprime_r (struct racional r){ //NÃO RETORNA NADAAAAA
   printf("%ld/%ld", r.num, r.den);
 }
 
-
-
 /* Retorna a soma dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
-struct racional soma_r (struct racional r1, struct racional r2){
+struct racional soma_r(struct racional r1, struct racional r2)
+{
 
-  struct racional resultado;  
-  
-  if(valido_r(r1) && valido_r(r2)){
+  struct racional resultado;
+
+  if (valido_r(r1) && valido_r(r2))
+  {
     resultado.num = ((r1.num * r2.den) + (r2.num * r1.den));
     resultado.den = r1.den * r2.den;
     resultado = simplifica_r(resultado);
-
-  } else {
+  }
+  else
+  {
     resultado.num = 0;
     resultado.den = 0;
   }
 
   return resultado;
 }
-
-
 
 /* Retorna a subtração dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
-struct racional subtrai_r (struct racional r1, struct racional r2){
-  
+struct racional subtrai_r(struct racional r1, struct racional r2)
+{
+
   struct racional resultado;
-  
-  if(valido_r(r1) && valido_r(r2)){
+
+  if (valido_r(r1) && valido_r(r2))
+  {
     resultado.num = ((r1.num * r2.den) - (r2.num * r1.den));
     resultado.den = r1.den * r2.den;
     resultado = simplifica_r(resultado);
-
-  } else {
+  }
+  else
+  {
     resultado.num = 0;
     resultado.den = 0;
   }
 
   return resultado;
 }
-
-
 
 /* Retorna a multiplicação dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido */
-struct racional multiplica_r (struct racional r1, struct racional r2){
+struct racional multiplica_r(struct racional r1, struct racional r2)
+{
 
   struct racional resultado;
-  
-  if(valido_r(r1) && valido_r(r2)){
+
+  if (valido_r(r1) && valido_r(r2))
+  {
     resultado.num = r1.num * r2.num;
     resultado.den = r1.den * r2.den;
     resultado = simplifica_r(resultado);
-
-  } else {
+  }
+  else
+  {
     resultado.num = 0;
     resultado.den = 0;
   }
 
   return resultado;
-  
 }
-
-
 
 /* Retorna a divisão dos racionais r1 e r2.
  * se r1 ou r2 for inválido, o resultado deve ser inválido.
  * observe que a divisão com r1 e r2 válidos pode gerar um racional inválido */
-struct racional divide_r (struct racional r1, struct racional r2){
-  
-   struct racional resultado;
-  
-  if(valido_r(r1) && valido_r(r2)){
+struct racional divide_r(struct racional r1, struct racional r2)
+{
 
-    // se o numerador do divisor é 0 → divisão inválida
-        if (r2.num == 0) {
-            resultado.num = 1;  // marcador especial
-            resultado.den = 0;  // den=0 mas num≠0 → imprime "DIVISAO INVALIDA"
-            return resultado;
-        }
+  struct racional resultado;
+
+  if (valido_r(r1) && valido_r(r2))
+  {
 
     resultado.num = r1.num * r2.den;
     resultado.den = r1.den * r2.num;
 
     // se o denominador virou zero, marca como inválido
-    if (resultado.den == 0) {
-          resultado.num = 0;
-          resultado.den = 0; // den=0 e num=0 → imprime "NUMERO INVALIDO"
-    } else {
-          resultado = simplifica_r(resultado);
+    if (resultado.den == 0)
+    {
+      resultado.num = 0;
+      resultado.den = 0;
     }
-
-  } else {
-    resultado.num = 0; //cria_r(0,0); // inválido
+    else
+    {
+      resultado = simplifica_r(resultado);
+    }
+  }
+  else
+  {
+    resultado.num = 0;
     resultado.den = 0;
   }
 
   return resultado;
-  
 }
