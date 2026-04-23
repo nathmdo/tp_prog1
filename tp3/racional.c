@@ -9,7 +9,7 @@
  * funções auxiliares para facilitar a implementação daquelas funções.
 */
 
-/* coloque aqui seus includes (primeiro os <...>, depois os "...") */
+
 #include <stdio.h>
 #include "racional.h"
 
@@ -52,10 +52,24 @@ long mmc (long a, long b)
  * Se o denominador for negativo, o sinal deve migrar para o numerador. */
 int simplifica_r (struct racional *r)
 {
-  /* implemente aqui */
+  if(r==NULL || r->den==0) return 0; //se r for nulo ou se o den=0
+
+  // Calcula o MDC do numerador e denominador
+  long divisor = mdc(abs(r->num), abs(r->den));
+
+  //simplifica
+  r->num = r->num / divisor;
+  r->den = r->den / divisor;
+
+  // jogo de sinais
+  if (r->den < 0)
+  {
+    r->num = -r->num;
+    r->den = -r->den;
+  }
+  return 1;
 }
 
-/* implemente as demais funções de racional.h aqui */
 
 
 /* Retorna o numerador do racional r */
@@ -68,14 +82,33 @@ long denominador_r (struct racional *r);
  * e retorna um ponteiro que aponta para ele.
  * A memória para o número racional deve ser alocada dinamicamente
  * por esta função. Retorna NULL se não conseguiu alocar a memória. */
-struct racional *cria_r (long numerador, long denominador);
+struct racional *cria_r (long numerador, long denominador){
+  struct racional *r = malloc(sizeof(struct racional));
+  if(r == NULL){ //r é um ponteiro
+    return NULL;
+  }
+  if (denominador == 0) {
+    free(r);
+    return NULL; // racional inválido
+}
+
+  r->den = denominador; // equivalente a (*r).den = denominador;
+  r->num = numerador; //-> pois tenho um ponteiro para uma struct
+
+  return r;
+}
 
 /* Libera a memória alocada para o racional apontado por r */
 void destroi_r (struct racional **r);
 
 /* Retorna 1 se o racional r for válido ou 0 se for inválido. Um racional
  * é inválido se o denominador for zero ou se ele não tiver sido alocado. */
-int valido_r (struct racional *r);
+int valido_r (struct racional *r)
+{
+  if(r->den == NULL) return 0;
+  if(r->den == 0) return 0;
+  return 1;
+}
 
 /* Imprime um racional r, respeitando estas regras:
    - o racional deve estar na forma simplificada;
@@ -88,7 +121,39 @@ int valido_r (struct racional *r);
      - se o numerador e denominador forem iguais, imprime somente "1";
      - se o racional for negativo, o sinal é impresso antes do número;
      - se numerador e denominador forem negativos, o racional é positivo. */
-void imprime_r (struct racional *r);
+void imprime_r (struct racional *r)
+{
+  if(r == NULL){ //se ponteiro nulo
+    printf("NULL");
+    return;
+  }
+
+  // simplifica antes de imprimir ************************
+    if (!simplifica_r(r)) {
+        printf("NaN");
+        return;
+  }
+
+  if(!valido_r(r)){ 
+    printf("NaN");
+    return;
+  }
+
+  if(r->num == 0){ //se num == 0
+    printf("0");
+    return;
+  }
+  if(r->den == 1){ //se den == 0
+    printf("%ld", r->num);
+    return;
+  }
+  if(r->num == r->den){
+    printf("1");
+    return;
+  }
+  
+  printf("%ld/%ld", r->num, r->den);
+}
 
 /* Compara dois números racionais r1 e r2.
  * Retorna -2 se r1 ou r2 for inválido ou se o respectivo ponteiro for nulo.
@@ -96,11 +161,36 @@ void imprime_r (struct racional *r);
  * Atenção: faça a comparação normalizando os denominadores pelo MMC.
  * Fazer a comparação baseado na divisão do numerador pelo denominador
  * pode gerar erro de arredondamento e falsear o resultado. */
-int compara_r (struct racional *r1, struct racional *r2);
+int compara_r (struct racional *r1, struct racional *r2)
+{
+  if(r1 == NULL || r2 == NULL) return -2;
+  if(!valido_r(r1) || !valido_r(r2)) return -2;
+
+  long m = mmc(r1->den, r2->den);
+
+  long a = r1->num * (m / r1->den);
+  long b = r2->num * (m / r2->den);
+
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 
 /* Coloca em *r3 a soma simplificada dos racionais *r1 e *r2.
  * Retorna 1 em sucesso e 0 se r1 ou r2 for inválido ou um ponteiro for nulo. */
-int soma_r (struct racional *r1, struct racional *r2, struct racional *r3);
+int soma_r (struct racional *r1, struct racional *r2, struct racional *r3)
+{
+  if(r3 == NULL || r3 == NULL || r3 == NULL) return 0;
+  if (!valido_r(r1) || !valido_r(r2)) return 0;
+
+  // Calcula soma
+  r3->num = r1->num * r2->den + r2->num * r1->den;
+  r3->den = r1->den * r2->den;
+  
+  simplifica_r(r3);
+  return 1;
+}
 
 /* Coloca em *r3 a diferença simplificada dos racionais *r1 e *r2.
  * Retorna 1 em sucesso e 0 se r1 ou r2 for inválido ou um ponteiro for nulo. */
