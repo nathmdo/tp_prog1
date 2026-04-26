@@ -48,15 +48,22 @@ struct racional *soma_vetor(struct racional **v, int n)
   struct racional *soma = cria_r(0,1); //cria um racional "soma" com valor 0/1 (significa zero mas em racional)
   if (soma == NULL) return NULL;
   // se não conseguiu alocar memória, aborta
-  if (!soma) return NULL;
 
   //percorre o vetor
   for(int i=0; i<n; i++){
 
-    struct racional tmp; //variável temporária para guardar o resultado da soma
-    if(soma_r(soma, v[i], &tmp)){
-      *soma = tmp; //atualiza 'soma' com o resultado armazenado em tmp
-    }
+    // ignora inválidos
+    if (v[i] == NULL || !valido_r(v[i])) continue;
+
+    struct racional *tmp = cria_r(0,1); //variável temporária para guardar o resultado da soma
+    if (!tmp) continue;
+
+      if (soma_r(soma, v[i], tmp)) {
+          free(soma);     // libera o antigo
+          soma = tmp;     // passa a apontar pro novo
+      } else {
+          free(tmp);
+      }
   }
   simplifica_r(soma);
 
@@ -115,7 +122,7 @@ int main ()
   }
 
   //imprime a soma de todos os elementos do vetor
-  struct racional resultado = soma_vetor(vetor, n);
+  struct racional *resultado = soma_vetor(vetor, n);
   printf("\nSOMA = ");
   imprime_r(resultado);
 
