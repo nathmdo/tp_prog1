@@ -38,17 +38,17 @@ long mmc (long a, long b)
   return (a * b) / mdc(a, b);
 }
 
-/* Simplifica o número racional indicado no parâmetro.
- * Por exemplo, se o número for 10/8 muda para 5/4.
- * Retorna 1 em sucesso e 0 se r for inválido ou o ponteiro for nulo.
- * Se ambos numerador e denominador forem negativos, o resultado é positivo.
- * Se o denominador for negativo, o sinal deve migrar para o numerador. */
+long l_abs(long x) {
+    return x < 0 ? -x : x;
+}
+
+/* Simplifica o número racional indicado no parâmetro. */
 int simplifica_r (struct racional *r)
 {
-  if(r==NULL || r->den==0) return 0; //se r for nulo ou se o den=0
+  if(r==NULL || r->den==0) return 0;
 
   // Calcula o MDC do numerador e denominador
-  long divisor = mdc(abs(r->num), abs(r->den));
+  long divisor = mdc(l_abs(r->num), l_abs(r->den));
 
   //simplifica
   r->num = r->num / divisor;
@@ -83,16 +83,9 @@ long denominador_r (struct racional *r)
  * por esta função. Retorna NULL se não conseguiu alocar a memória. */
 struct racional *cria_r (long numerador, long denominador){
   struct racional *r = malloc(sizeof(struct racional));
-  if(r == NULL){ //r é um ponteiro
-    return NULL;
-  }
-  if (denominador == 0) {
-    free(r);
-    return NULL; // racional inválido
-}
 
-  r->den = denominador; // equivalente a (*r).den = denominador;
-  r->num = numerador; //-> pois tenho um ponteiro para uma struct
+  r->den = denominador;
+  r->num = numerador; 
 
   return r;
 }
@@ -100,7 +93,7 @@ struct racional *cria_r (long numerador, long denominador){
 /* Libera a memória alocada para o racional apontado por r */
 void destroi_r (struct racional **r)
 {
-  if(r != NULL){
+  if(r != NULL && *r != NULL){
     free(*r);
     *r = NULL;
   }
@@ -117,7 +110,7 @@ int valido_r (struct racional *r)
 /* Imprime um racional r */
 void imprime_r (struct racional *r)
 {
-  if(r == NULL){ //se ponteiro nulo
+  if(r == NULL){ 
     printf("NULL");
     return;
   }
@@ -126,7 +119,7 @@ void imprime_r (struct racional *r)
     return;
   }
 
-  simplifica_r(r);
+  simplifica_r(r);//
 
   if(r->num == 0){
     printf("0");
@@ -146,10 +139,7 @@ void imprime_r (struct racional *r)
 
 /* Compara dois números racionais r1 e r2.
  * Retorna -2 se r1 ou r2 for inválido ou se o respectivo ponteiro for nulo.
- * Retorna -1 se r1 < r2; 0 se r1 = r2; 1 se r1 > r2.
- * Atenção: faça a comparação normalizando os denominadores pelo MMC.
- * Fazer a comparação baseado na divisão do numerador pelo denominador
- * pode gerar erro de arredondamento e falsear o resultado. */
+ * Retorna -1 se r1 < r2; 0 se r1 = r2; 1 se r1 > r2. */
 int compara_r (struct racional *r1, struct racional *r2)
 {
   if(r1 == NULL || r2 == NULL) return -2;

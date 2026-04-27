@@ -4,36 +4,40 @@
  * Feito em 09/09/2025 para a disciplina CI1001 - Programação 1.
 */
 
-/* coloque aqui seus includes (primeiro os <...>, depois os "...") */
 #include <stdio.h>
-#include <stdlib.h> //malloc
+#include <stdlib.h> 
 #include "racional.h"
 
 #define MAX 100
 
-//Remove os elementos inválidas do vetor e retorna o novo tamanho.
-int remove_invalidos(struct racional **v, int n){ //**V pois v[i] é struct *   */
-  int novo_n = 0;
-  for(int i=0; i<n; i++){
-    if(v[i] != NULL){
-      v[novo_n] = v[i];
-      novo_n++;
+/* Remove os elementos inválidas do vetor e retorna o novo tamanho. */
+int remove_invalidos(struct racional **v, int n)
+{
+  int j = 0;
+  for (int i = 0; i < n; i++) {
+    if (v[i] != NULL && valido_r(v[i])) {
+      v[j++] = v[i];
+    } else {
+      destroi_r(&v[i]);
     }
   }
-  return novo_n;
+  for (int i = j; i < n; i++) {
+    v[i] = NULL;  
+  }
+
+  return j;
 }
 
-void ordena_vetor(struct racional *v[], int n) //*v[] equivalente a **v
+/* Função para ordenar o vetor, selection sort */
+void ordena_vetor(struct racional *v[], int n) 
 {  
-  // v é um ponteiro para vetor[0]
   for(int i=0; i < n - 1; i++){
-    int min = i; //assume que o menor está na pos i
+    int min = i; 
     for(int j = i + 1; j < n; j++){
-      if(compara_r(v[j], v[min]) < 0){ //compara retorna -1 se r1 for menor
-        min = j; //achou um menor, atualiza o índice
+      if(compara_r(v[j], v[min]) < 0){ 
+        min = j; 
       }
     }
-    //troca v[i] com v[min], se necessário
     if(min != i){
       struct racional *tmp = v[i];
       v[i] = v[min];
@@ -42,31 +46,17 @@ void ordena_vetor(struct racional *v[], int n) //*v[] equivalente a **v
   }
 }
 
-
-struct racional *soma_vetor(struct racional **v, int n)
+/* Soma dos elementos do vetor */
+struct racional *soma_vetor(struct racional **v, int n) 
 {
-  struct racional *soma = cria_r(0,1); //cria um racional "soma" com valor 0/1 (significa zero mas em racional)
-  if (soma == NULL) return NULL;
-  // se não conseguiu alocar memória, aborta
+  struct racional *soma = cria_r(0,1); 
+  if (!soma) return NULL;
 
-  //percorre o vetor
-  for(int i=0; i<n; i++){
-
-    // ignora inválidos
-    if (v[i] == NULL || !valido_r(v[i])) continue;
-
-    struct racional *tmp = cria_r(0,1); //variável temporária para guardar o resultado da soma
-    if (!tmp) continue;
-
-      if (soma_r(soma, v[i], tmp)) {
-          free(soma);     // libera o antigo
-          soma = tmp;     // passa a apontar pro novo
-      } else {
-          free(tmp);
-      }
-  }
-  simplifica_r(soma);
-
+  for (int i = 0; i < n; i++) {
+        if (v[i] && valido_r(v[i])) {
+            soma_r(soma, v[i], soma);  //deu bo aqui
+        }
+    }
   return soma;
 }
 
@@ -76,26 +66,18 @@ int main ()
 {
   int n;
 
-  //ler n
   scanf("%d", &n);
-  
-  //se n fora dos parâmetros
   if(n<=0 || n>=MAX) return 0;
 
-
-  /* Inicialmente, você vai alocar dinamicamente um vetor de ponteiros para N números racionais.*/
-  //Aqui você está alocando espaço para n ponteiros (não para os racionais ainda). Cada posição vetor[i] será um ponteiro para um struct racional.
-  //aloca vetor de ponteiros
-  struct racional **vetor = malloc(n * sizeof(struct racional *)); //usa **vetor pq quero um ponteiro para ponteiros, no caso um vetor de ponteiros. 
-  //struct racional * seria um ponteiro para uma estrutura racional (um vetor contínuo de racionais).
+  struct racional **vetor = malloc(n * sizeof(struct racional *));
   if(!vetor) return 0; 
 
 
-  /*Em seguida, você vai inicializar o vetor com ponteiros para N números racionais lidos a partir do teclado e vai inserir estes ponteiros, na mesma ordem da leitura, no vetor.*/
+  // Inicializar o vetor com ponteiros para N números racionais lidos 
   for(int i=0; i<n; i++){
       long num, den;
       scanf("%ld %ld", &num, &den);
-      vetor[i] = criar_r(num, den);
+      vetor[i] = cria_r(num, den);
   }
 
   //imprime vetor
@@ -113,7 +95,7 @@ int main ()
         printf(" ");
   }
 
-//imprime o vetor ordenado em ordem crescente
+  //imprime o vetor ordenado em ordem crescente
   ordena_vetor(vetor, n);
   printf("\nVETOR = ");
   for(int i=0; i<n; i++){
@@ -124,24 +106,24 @@ int main ()
   //imprime a soma de todos os elementos do vetor
   struct racional *resultado = soma_vetor(vetor, n);
   printf("\nSOMA = ");
-  imprime_r(resultado);
+  imprime_r(resultado);  
 
   //liberar os racionais apontados pelo vetor
+  for (int i = 0; i < n; i++) {
+    destroi_r(&vetor[i]);
+  }
    printf("\nVETOR = ");
    for(int i=0; i<n; i++){
     imprime_r(vetor[i]);
     printf(" ");
   }
 
-  //liberar o vetor de ponteiros
+  printf("\n");
+
   free(vetor);
   vetor = NULL;
-
-//liberar o espaço utilizado para fazer o cálculo da soma
-
-
-
+  
+  destroi_r(&resultado);
 
   return 0;
 }
-
