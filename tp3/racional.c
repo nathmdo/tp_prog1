@@ -85,7 +85,7 @@ struct racional *cria_r (long numerador, long denominador){
   struct racional *r = malloc(sizeof(struct racional));
 
   r->den = denominador;
-  r->num = numerador; 
+  r->num = numerador;
 
   return r;
 }
@@ -119,22 +119,23 @@ void imprime_r (struct racional *r)
     return;
   }
 
-  simplifica_r(r);//
+  struct racional copia = *r;
+  simplifica_r(&copia);
 
-  if(r->num == 0){
+  if(copia.num == 0){
     printf("0");
     return;
   }
-  if(r->num == r->den){
+  if(copia.num == copia.den){
     printf("1");
     return;
   }
-  if(r->den == 1){ 
-    printf("%ld", r->num);
+  if(copia.den == 1){ 
+    printf("%ld", copia.num);
     return;
   }
   
-  printf("%ld/%ld", r->num, r->den);
+  printf("%ld/%ld", copia.num, copia.den);
 }
 
 /* Compara dois números racionais r1 e r2.
@@ -145,10 +146,31 @@ int compara_r (struct racional *r1, struct racional *r2)
   if(r1 == NULL || r2 == NULL) return -2;
   if(!valido_r(r1) || !valido_r(r2)) return -2;
 
-  long m = mmc(r1->den, r2->den);
+  /*long m = mmc(r1->den, r2->den);
 
   long a = r1->num * (m / r1->den);
   long b = r2->num * (m / r2->den);
+
+  long long a = (long long) r1->num * r2->den;
+  long long b = (long long) r2->num * r1->den;*/
+
+  // normaliza sinais localmente
+  long n1 = numerador_r(r1);
+  long d1 = denominador_r(r1);
+  long n2 = numerador_r(r2);
+  long d2 = denominador_r(r2);
+
+  if (d1 < 0) {
+    n1 = -n1;
+    d1 = -d1;
+  }
+  if (d2 < 0) {
+    n2 = -n2;
+    d2 = -d2;
+  }
+
+  long long a = (long long) n1 * d2;
+  long long b = (long long) n2 * d1;
 
   if (a < b) return -1;
   if (a > b) return 1;

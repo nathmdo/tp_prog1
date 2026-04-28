@@ -24,7 +24,6 @@ int remove_invalidos(struct racional **v, int n)
   for (int i = j; i < n; i++) {
     v[i] = NULL;  
   }
-
   return j;
 }
 
@@ -47,19 +46,37 @@ void ordena_vetor(struct racional *v[], int n)
 }
 
 /* Soma dos elementos do vetor */
-struct racional *soma_vetor(struct racional **v, int n) 
+struct racional *soma_vetor(struct racional **v, int n)
 {
-  struct racional *soma = cria_r(0,1); 
-  if (!soma) return NULL;
+  struct racional *soma = cria_r(0,1);
+  struct racional *tmp  = cria_r(0,1);
+
+  if (!soma || !tmp) return NULL;
 
   for (int i = 0; i < n; i++) {
-        if (v[i] && valido_r(v[i])) {
-            soma_r(soma, v[i], soma);  //deu bo aqui
-        }
+    if (v[i] && valido_r(v[i])) {
+      soma_r(soma, v[i], tmp);
+
+      struct racional *swap = soma;
+      soma = tmp;
+      tmp = swap;
     }
+  }
+  destroi_r(&tmp);
   return soma;
 }
 
+void imprime_vetor(struct racional **v, int n)
+{
+  printf("VETOR = ");
+  for(int i=0; i<n; i++){
+        imprime_r(v[i]);
+        if(i < n - 1){
+          printf(" ");
+        }
+  }
+  printf("\n");
+}
 
 /* programa principal */
 int main ()
@@ -80,45 +97,29 @@ int main ()
       vetor[i] = cria_r(num, den);
   }
 
-  //imprime vetor
-  printf("VETOR = ");
-  for(int i=0; i<n; i++){
-        imprime_r(vetor[i]);
-        printf(" ");
-  }
+  //imprime o vetor lido
+  imprime_vetor(vetor, n);
 
   //imprime o vetor sem os inválidos
   n = remove_invalidos(vetor, n);
-  printf("\nVETOR = ");
-  for(int i=0; i<n; i++){
-        imprime_r(vetor[i]);
-        printf(" ");
-  }
+  imprime_vetor(vetor, n);
 
   //imprime o vetor ordenado em ordem crescente
   ordena_vetor(vetor, n);
-  printf("\nVETOR = ");
-  for(int i=0; i<n; i++){
-    imprime_r(vetor[i]);
-    printf(" ");
-  }
+  imprime_vetor(vetor, n);
 
   //imprime a soma de todos os elementos do vetor
   struct racional *resultado = soma_vetor(vetor, n);
-  printf("\nSOMA = ");
-  imprime_r(resultado);  
+  printf("SOMA = ");
+  imprime_r(resultado); 
+  printf("\n");
 
   //liberar os racionais apontados pelo vetor
   for (int i = 0; i < n; i++) {
     destroi_r(&vetor[i]);
   }
-   printf("\nVETOR = ");
-   for(int i=0; i<n; i++){
-    imprime_r(vetor[i]);
-    printf(" ");
-  }
 
-  printf("\n");
+  imprime_vetor(vetor, n);
 
   free(vetor);
   vetor = NULL;
