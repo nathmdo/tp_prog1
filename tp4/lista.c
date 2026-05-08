@@ -93,7 +93,7 @@ int lista_insere_fim (struct lista *lista, int chave){
  * Insere chave em ordem na lista. Retorna 1
  * em caso de sucesso e 0 em caso de falha.
 */
-int lista_insere_ordenado (struct lista *lista, int chave){
+int lista_insere_ordenado (struct lista *lista, int chave){ /*********************************************************************************** */
     if(!lista) return 0;
         struct nodo *novo = malloc(sizeof(struct nodo)); //cria um novo nodo
         if(!novo) return 0;
@@ -168,28 +168,70 @@ int lista_remove_fim (struct lista *lista, int *chave){
     */
 }
 
-int lista_remove_ordenado (struct lista *lista, int chave){
+/*
+ * Remove o elemento chave da lista mantendo-a ordenada.
+ * A função considera que a cheve esta presente na lista, quem chama
+ * esta funcao deve garantir isso.
+ * A funcao retorna 1 em caso de sucesso e 0 no caso da lista estar vazia.
+*/
+int lista_remove_ordenado (struct lista *lista, int chave){ /****************************************************************** */
 }
 
+/*
+  Retorna 1 se a lista está vazia e 0 caso contrário.
+*/
 int lista_vazia (struct lista *lista){
     if(lista->tamanho == 0) return 1;
-        return 0;
+    return 0;
         //ou
         //if(lista->ini == NULL) return 1;
         //return 0;
 }
 
+/*
+  Retorna o numero de elementos da lista
+*/
 int lista_tamanho (struct lista *lista){
     //if(!lista) return -1;
 
-        return lista->tamanho;
+    return lista->tamanho;
 }
 
-int lista_pertence (struct lista *lista, int chave){
+/*
+  Retorna 1 se o elemento chave esta presente na lista,
+  caso contrário retorna 0.
+*/
+int lista_pertence (struct lista *lista, int chave){  //******************* erradooooooooooooooooo ******************************* */
+
+    lista_inicia_iterador(lista);
+    for(int i = 0; i < lista->tamanho; i++){
+        if(chave == lista->ptr->chave) return 1;
+        lista_incrementa_iterador(lista, chave);
+    }
+
+    return 0;
 }
 
+/*
+ * Inicializa ptr usado na funcao incrementa_iterador.
+ * A funcao main deve garantir que a lista nao eh vazia.
+*/
+//o iterador permite andar na lista sem precisar mexer na estrutura dela
 void lista_inicia_iterador (struct lista *lista){
+    if(lista != NULL){
+        lista->ptr = lista->ini->prox; //aponta para o primeiro elemento
+    }
 }
 
+/*
+ * Devolve no parametro *chave o elemento apontado e incrementa o iterador.
+ * A funcao retorna 0 caso o iterador ultrapasse o ultimo elemento, ou retorna
+ * 1 caso o iterador aponte para um elemento valido (dentro da lista).
+*/
 int lista_incrementa_iterador (struct lista *lista, int *chave){
+    if(lista == NULL || lista->ptr == NULL ) return 0;
+    *chave = lista->ptr->chave; //devolve a chave atual
+    lista->ptr = lista->ptr->prox; //incrementa o iterador apontando para o próximo
+
+    return 1;
 }
